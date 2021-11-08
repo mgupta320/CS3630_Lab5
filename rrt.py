@@ -13,17 +13,19 @@ MAX_NODES = 20000
 
 def step_from_to(node0, node1, limit=75):
     ########################################################################
-    # TODO: please enter your code below.
     # 1. If distance between two nodes is less than limit, return node1
     # 2. Otherwise, return a node in the direction from node0 to node1 whose
     #    distance to node0 is limit. Recall that each iteration we can move
     #    limit units at most
     # 3. Hint: please consider using np.arctan2 function to get vector angle
     # 4. Note: remember always return a Node object
-    
-    
-    #temporary cod below to be replaced
-    return node1
+    if get_dist(node0, node1) <= limit:
+        return node1
+    angle = math.atan2(node1.y - node0.y, node1.x - node0.x)
+    new_x = node0.x + limit * math.cos(angle)
+    new_y = node0.y + limit * math.sin(angle)
+    return Node((new_x, new_y))
+
     ############################################################################
 
     
