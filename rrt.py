@@ -62,7 +62,6 @@ def RRT(cmap, start):
     map_width, map_height = cmap.get_size()
     while (cmap.get_num_nodes() < MAX_NODES):
         ########################################################################
-        # TODO: please enter your code below.
         # 1. Use CozMap.get_random_valid_node() to get a random node. This
         #    function will internally call the node_generator above
         # 2. Get the nearest node to the random node from RRT
@@ -72,12 +71,18 @@ def RRT(cmap, start):
         
         
         #temporary code below to be replaced
-        rand_node = None
+        rand_node = cmap.get_random_valid_node()
         nearest_node = None
-        pass
+        min_distance = map_height * map_width
+        for node in cmap.get_nodes():
+            new_distance = get_dist(rand_node, node)
+            if new_distance < min_distance:
+                min_distance = new_distance
+                nearest_node = node
+        rand_node = step_from_to(nearest_node, rand_node)
+        rand_node.parent = nearest_node
+        cmap.add_node(rand_node)
         ########################################################################
-        
-        
         time.sleep(0.01)
         cmap.add_path(nearest_node, rand_node)
         if cmap.is_solved():
