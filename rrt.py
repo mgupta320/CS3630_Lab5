@@ -42,7 +42,7 @@ def node_generator(cmap):
     
     # temporary cod below to be replaced
     if rand.random() < .05:
-        rand_node = rand.choice(cmap.get_goals())
+        rand_node = Node(rand.choice(cmap.get_goals()).coord)
     else:
         keep_search = True
         while keep_search:
