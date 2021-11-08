@@ -2,6 +2,7 @@ import cozmo
 import math
 import sys
 import time
+import random as rand
 
 from cmap import *
 from gui import *
@@ -33,15 +34,22 @@ def step_from_to(node0, node1, limit=75):
 def node_generator(cmap):
     rand_node = None
     ############################################################################
-    # TODO: please enter your code below.
     # 1. Use CozMap width and height to get a uniformly distributed random node
     # 2. Use CozMap.is_inbound and CozMap.is_inside_obstacles to determine the
     #    legitimacy of the random node.
     # 3. Note: remember always return a Node object
     
     
-    #temporary cod below to be replaced
-    pass
+    # temporary cod below to be replaced
+    if rand.random() < .05:
+        rand_node = rand.choice(cmap.get_goals())
+    else:
+        keep_search = True
+        while keep_search:
+            x = rand.randrange(0, cmap.width)
+            y = rand.randrange(0, cmap.height)
+            rand_node = Node((x, y))
+            keep_search = cmap.is_inside_obstacles(rand_node)
     return rand_node
     ############################################################################
     
