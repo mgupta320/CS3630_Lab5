@@ -234,8 +234,25 @@ class CozMap:
         
         
         #temporary code below to be replaced
+        smoothed_path = []
         path = self.get_path()
-        return path
+        start_node = path[0]
+        end_index = 0
+        next_node = path[end_index]
+        smoothed_path.append(start_node)
+        while not next_node == path[-1]:
+            dist = get_dist(start_node, next_node)
+            if int(dist) <= int(limit) and not self.is_collision_with_obstacles((start_node, next_node)):
+                end_index += 1
+                next_node = path[end_index]
+            else:
+                end_index -= 1
+                next_node = path[end_index]
+                smoothed_path.append(next_node)
+                start_node = next_node
+                next_node = path[end_index]
+        smoothed_path.append(next_node)
+        return smoothed_path
 
         ############################################################################
         

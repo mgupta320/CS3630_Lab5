@@ -19,12 +19,18 @@ def step_from_to(node0, node1, limit=75):
     #    limit units at most
     # 3. Hint: please consider using np.arctan2 function to get vector angle
     # 4. Note: remember always return a Node object
-    if get_dist(node0, node1) <= limit:
+    distance = get_dist(node0, node1)
+    if distance <= limit:
         return node1
     angle = math.atan2(node1.y - node0.y, node1.x - node0.x)
     new_x = node0.x + limit * math.cos(angle)
     new_y = node0.y + limit * math.sin(angle)
-    return Node((new_x, new_y))
+    '''
+    new_x = node0.x + (node1.x - node0.x) * distance / limit
+    new_y = node0.y + (node1.y - node0.y) * distance / limit
+    '''
+    new_node = Node((new_x, new_y))
+    return new_node
 
     ############################################################################
 
@@ -72,21 +78,25 @@ def RRT(cmap, start):
         
         #temporary code below to be replaced
         rand_node = cmap.get_random_valid_node()
-        nearest_node = None
+        nearest_node = start
         min_distance = map_height * map_width
+
         for node in cmap.get_nodes():
             new_distance = get_dist(rand_node, node)
             if new_distance < min_distance:
                 min_distance = new_distance
                 nearest_node = node
+
         rand_node = step_from_to(nearest_node, rand_node)
-        rand_node.parent = nearest_node
-        cmap.add_node(rand_node)
-        ########################################################################
-        time.sleep(0.01)
-        cmap.add_path(nearest_node, rand_node)
-        if cmap.is_solved():
-            break
+        if not (cmap.is_inside_obstacles(rand_node) or not cmap.is_inbound(rand_node)):
+            # cmap.add_node(rand_node)
+            ########################################################################
+            time.sleep(0.01)
+            cmap.add_path(nearest_node, rand_node)
+
+            if cmap.is_solved():
+                break
+
 
     path = cmap.get_path()
     smoothed_path = cmap.get_smooth_path()
