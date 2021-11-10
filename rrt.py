@@ -174,12 +174,15 @@ def get_global_node(local_angle, local_origin, node):
         new_node -- a Node object that decribes the node's position in global coordinate frame
     """
     ########################################################################
-    # TODO: please enter your code below.
-    
-    
-    
-    #temporary code below to be replaced
-    new_node = None
+    a = np.matrix([[Math.cos(local_angle), -Math.sin(local_angle), local_origin[0]],
+                    [Math.sin(local_angle), Math.cos(local_angle), local_origin[1]],
+                    [0, 0, 1]])
+
+    b = np.matrix([[node[0]],
+                    [node[1]],
+                    1])
+
+    new_node = a @ b
     return new_node
     ########################################################################
 
