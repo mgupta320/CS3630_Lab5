@@ -1,3 +1,4 @@
+# Mehul Gupta and Turner Edwards
 import json
 import threading
 
@@ -228,11 +229,27 @@ class CozMap:
 
     def compute_smooth_path(self, limit=75):
         ############################################################################
-        # TODO: please enter your code below.
-        
-        
-        
-        
+        smoothed_path = []
+        path = self.get_path()
+        end_index = -1
+        start_index = 0
+        while not path[start_index] == path[end_index]:
+            start_node = path[start_index]
+            end_node = path[end_index]
+            if not self.is_collision_with_obstacles((start_node, end_node)):
+                smoothed_path.append(start_node)
+                next_node = None
+                while not next_node == end_node:
+                    next_node = rrt.step_from_to(start_node, end_node, limit)
+                    smoothed_path.append(next_node)
+                    start_node = next_node
+                start_index = end_index
+                end_index = -1
+            else:
+                end_index -= 1
+        smoothed_path.append(path[-1])
+
+        '''
         #temporary code below to be replaced
         smoothed_path = []
         path = self.get_path()
@@ -252,7 +269,9 @@ class CozMap:
                 start_node = next_node
                 next_node = path[end_index]
         smoothed_path.append(next_node)
+        '''
         return smoothed_path
+
 
         ############################################################################
         

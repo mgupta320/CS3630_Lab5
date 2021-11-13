@@ -1,3 +1,4 @@
+# Mehul Gupta and Turner Edwards
 import cozmo
 import math
 import sys
@@ -34,10 +35,6 @@ def step_from_to(node0, node1, limit=75):
 
     ############################################################################
 
-    
-    
-    
-
 
 def node_generator(cmap):
     rand_node = None
@@ -60,7 +57,6 @@ def node_generator(cmap):
             keep_search = cmap.is_inside_obstacles(rand_node)
     return rand_node
     ############################################################################
-    
 
 
 def RRT(cmap, start):
@@ -108,7 +104,6 @@ def RRT(cmap, start):
         print("Smoothed path length: ", len(smoothed_path))
     else:
         print("Please try again :-(")
-
 
 
 async def CozmoPlanning(robot: cozmo.robot.Robot):
@@ -160,9 +155,7 @@ async def CozmoPlanning(robot: cozmo.robot.Robot):
     
     ########################################################################
     
-    
-    
-    
+
 def get_global_node(local_angle, local_origin, node):
     """Helper function: Transform the node's position (x,y) from local coordinate frame specified by local_origin and local_angle to global coordinate frame.
                         This function is used in detect_cube_and_update_cmap()
@@ -174,8 +167,8 @@ def get_global_node(local_angle, local_origin, node):
         new_node -- a Node object that decribes the node's position in global coordinate frame
     """
     ########################################################################
-    a = np.matrix([[Math.cos(local_angle), -Math.sin(local_angle), local_origin[0]],
-                    [Math.sin(local_angle), Math.cos(local_angle), local_origin[1]],
+    a = np.matrix([[math.cos(local_angle), -math.sin(local_angle), local_origin[0]],
+                    [math.sin(local_angle), math.cos(local_angle), local_origin[1]],
                     [0, 0, 1]])
 
     b = np.matrix([[node[0]],
@@ -278,7 +271,7 @@ if __name__ == '__main__':
     stopevent = threading.Event()
     robotFlag = False
     for i in range(0,len(sys.argv)): #reads input whether we are running the robot version or not
-        if (sys.argv[i] == "-robot"):
+        if sys.argv[i] == "-robot":
             robotFlag = True
     if (robotFlag):
         #creates cmap based on empty grid json
@@ -288,7 +281,7 @@ if __name__ == '__main__':
         robot_thread = RobotThread()
         robot_thread.start()
     else:
-        cmap = CozMap("maps/map2.json", node_generator)
+        cmap = CozMap("maps/map6.json", node_generator)
         sim = RRTThread()
         sim.start()
     visualizer = Visualizer(cmap)
