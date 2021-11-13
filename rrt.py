@@ -108,11 +108,10 @@ def RRT(cmap, start):
         print("Please try again :-(")
 
 
-async def CozmoPlanning(robot: cozmo.robot.Robot):
+def CozmoPlanning(robot: cozmo.robot.Robot):
     # Allows access to map and stopevent, which can be used to see if the GUI
     # has been closed by checking stopevent.is_set()
     global cmap, stopevent
-
     ########################################################################
     # TODO: please enter your code below.
     # Description of function provided in instructions. Potential pseudcode is below
@@ -124,32 +123,30 @@ async def CozmoPlanning(robot: cozmo.robot.Robot):
     dim = cmap.get_size()
     dimWidth = dim[0] / 2
     dimHeight = dim[1] / 2
-    cmap.add_goal((dimWidth, dimHeight))
-    
+    cmap.add_goal(Node((dimWidth, dimHeight)))
     #reset the current stored paths in cmap
     #call the RRT function using your cmap as input, and RRT will update cmap with a new path to the target from the start position
     #get path from the cmap
     cmap.reset_paths()
-    RRT(cmap,(robot.pose.position.x, robot.pose.position.y))
+    RRT(cmap, cmap.get_start())
     path = cmap.get_smooth_path()
     
-    #marked and update_cmap are both outputted from detect_cube_and_update_cmap(robot, marked, cozmo_pos).
+    #marked and update_cmap are both outputted from detect _cube_and_update_cmap(robot, marked, cozmo_pos).
     #and marked is an input to the function, indicating which cubes are already marked
     #So initialize "marked" to be an empty dictionary and "update_cmap" = False
     marked = {}
     update_cmap = False
     curr_index = 0
     prev_angle = 0
-
     #while the current cosmo position is not at the goal:
-    while (robot.pose.position.x != cmap.goals[0].x and robot.pose.position.y != cmap.goals[0].y) or curr_index >= len(path):
+    while not path == None and (robot.pose.position.x != cmap.get_goals()[0].x and robot.pose.position.y != cmap.get_goals()[0].y)\
+            and not curr_index >= len(path)-1:
+
         current_node = path[curr_index]
         curr_index += 1
-    
+
         #break if path is none or empty, indicating no path was found
-        if path == None:
-            break
-        
+
         # Get the next node from the path
         #drive the robot to next node in path. #First turn to the appropriate angle, and then move to it
         #you can calculate the angle to turn through a trigonometric function
@@ -164,15 +161,15 @@ async def CozmoPlanning(robot: cozmo.robot.Robot):
 
         # Update the current Cozmo position (cozmo_pos and cozmo_angle) to be new node position and angle 
         prev_angle = next_angle
-        cozmo_pos = (next_node)
+        cozmo_pos = next_node
 
         # Set new start position for replanning with RRT
 
         # detect any visible obstacle cubes and update cmap
-        cubes_placed =  await detect_cube_and_update_cmap(robot, marked, robot.pose)
+        cubes_placed = detect_cube_and_update_cmap(robot, marked, cozmo_pos)
         
         #if we detected a cube, indicated by update_cmap, reset the cmap path, recalculate RRT, and get new paths
-        if cubes_placed:
+        if cubes_placed[0]:
             cmap.reset_paths()
             RRT(cmap, next_node)
             path = cmap.get_smooth_path()
@@ -190,20 +187,19 @@ def get_global_node(local_angle, local_origin, node):
         new_node -- a Node object that decribes the node's position in global coordinate frame
     """
     ########################################################################
-    a = np.matrix([[math.cos(local_angle), -math.sin(local_angle), local_origin[0]],
+    a = np.array([[math.cos(local_angle), -math.sin(local_angle), local_origin[0]],
                     [math.sin(local_angle), math.cos(local_angle), local_origin[1]],
                     [0, 0, 1]])
 
-    b = np.matrix([[node[0]],
-                    [node[1]],
-                    1])
-
-    new_node = a @ b
+    b = np.array([[node[0]], [node[1]], [1]])
+    b.reshape((3, 1))
+    new_node_mat = a @ b
+    new_node = Node((new_node_mat[0][0], new_node_mat[1][0]))
     return new_node
     ########################################################################
 
 
-async def detect_cube_and_update_cmap(robot, marked, cozmo_pos):
+def detect_cube_and_update_cmap(robot, marked, cozmo_pos):
     """Helper function used to detect obstacle cubes and the goal cube.
        1. When a valid goal cube is detected, old goals in cmap will be cleared and a new goal corresponding to the approach position of the cube will be added.
        2. Approach position is used because we don't want the robot to drive to the center position of the goal cube.
@@ -224,7 +220,7 @@ async def detect_cube_and_update_cmap(robot, marked, cozmo_pos):
     global cmap
 
     # Padding of objects and the robot for C-Space
-    cube_padding = 40.
+    cube_padding = 60.
     cozmo_padding = 100.
 
     # Flags
