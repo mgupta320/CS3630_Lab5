@@ -5,6 +5,8 @@ import sys
 import time
 import random as rand
 
+from cozmo.util import distance_mm, speed_mmps, radians
+
 from cmap import *
 from gui import *
 from utils import *
@@ -140,7 +142,7 @@ async def CozmoPlanning(robot: cozmo.robot.Robot):
     prev_angle = 0
 
     #while the current cosmo position is not at the goal:
-    while (robot.pose.position.x != cmap.goals[0].x && robot.pose.position.y != cmap.goals[0].y) or curr_index >= len(path):
+    while (robot.pose.position.x != cmap.goals[0].x and robot.pose.position.y != cmap.goals[0].y) or curr_index >= len(path):
         current_node = path[curr_index]
         curr_index += 1
     
@@ -154,10 +156,10 @@ async def CozmoPlanning(robot: cozmo.robot.Robot):
         next_node = path[curr_index]
 
         next_angle = math.atan2(next_node.y - current_node.y, next_node.x - current_node.x)
-        diff_angle = math.atan2(sin(next_angle - prev_angle), cos(next_angle - prev_angle))
+        diff_angle = math.atan2(math.sin(next_angle - prev_angle), math.cos(next_angle - prev_angle))
 
         robot.turn_in_place(radians(diff_angle)).wait_for_completed()
-        driveDistance = get_distance(current_node, next_node)
+        driveDistance = get_dist(current_node, next_node)
         robot.drive_straight(distance_mm(driveDistance), speed_mmps(50)).wait_for_completed()
 
         # Update the current Cozmo position (cozmo_pos and cozmo_angle) to be new node position and angle 
